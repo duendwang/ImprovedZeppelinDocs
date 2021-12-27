@@ -42,20 +42,6 @@ Now we need to get NVM to read the Node version and install the correct Node ver
 1. `cd ZeppelinBot`
 2. `nvm install`
 
-## Set up Github SSH Access
-Building the bot will access various Github repositories and download code from different places, code that the bot depends on. In order to do that, we need to set up a Github account if you don't have one yet, and set up SSH access via a key pair so your server can access these Github repositories as needed during the installation process.
-
-1. `ssh-keygen -t ed25519 -C "your_email@example.com"` (substituting your email address in the quotes; keep the quotes)
-2. `eval "$(ssh-agent)"`
-3. `ssh-add ~/.ssh/id_ed25519`
-4. `cat ~/.ssh/id_ed25519.pub` Copy all the text from the output
-5. Install the key pair to Github:
-  1. Log in to github (create an account if you need to)
-  2. Click on profile picture on top right and click on Settings
-  3. On the left, click on SSH and GPG Keys, then click New SSH Key
-  4. Paste text (from step 4) into Key box and name it. Then click the green save button.
-6. Back in the SSH shell, `ssh -T git@github.com`
-
 ## Install and Build the Bot and API
 
 ### Initial Installation
@@ -79,7 +65,7 @@ We'll fill in these env files later. First we need to set up the database
 
 1. `sudo mariadb`
     - If you have a root passsword set, it won't let you in. Run `sudo mariadb -p` instead and type in the password when asked. It won't display, so make sure you type it correctly then just press enter.
-2. Check what version of Mariadb is running. **If it is 10.2 or below, you need to upgrade Mariadb before you can continue**
+2. Check what version of Mariadb is running. **If it is 10.2 or below, upgrading to 10.6 is recommended to avoid issues**
     - `exit;`
     - `sudo apt remove mariadb-server`
     - `curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup`
@@ -160,8 +146,17 @@ Initial configurations and entries in the database need to be set up to use the 
     - Modify GUILD_ID, YOUR_ID X2
 6. `INSERT INTO api_permissions (guild_id, target_id, type, permissions) VALUES (GUILD_ID, YOUR_ID, "USER", "OWNER", null);`
     - Modify GUILD_ID, YOUR_ID
-7. `SET GLOBAL time_zone = '+0:00';`
-8. `exit;`
+7. `exit;`
+
+### Set MariaDB Default Timezone
+Zeppelin will complain if the MariaDB timezone is not set to UTC.
+
+1. `sudo nano /etc/mysql/mariadb.cnf`
+2. At the bottom, add:
+    ```[server]
+    default_time_zone = '+0:00'
+    ```
+3. Press **Ctrl-X**, then **Y**, then **Enter** to save the file and close Nano.
 
 ### Start Bot and API
 
